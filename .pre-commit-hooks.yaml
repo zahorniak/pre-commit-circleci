@@ -1,0 +1,5 @@
+- id: circleci_validate
+  name: Validate CircleCI config
+  description: This hook validate CircleCI config 
+  entry: circleci_validate.sh
+  language: script
