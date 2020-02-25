@@ -26,6 +26,13 @@ Validate CircleCI config.................................................Passed
  1 file changed, 5 insertions(+), 1 deletion(-)
  ```
 
+## How hook works
+|   Hook    |   Description    |
+|  ---  |  ---  |
+|   `circleci_validate`    |   Validates CircleCI configuration using command `circleci config validate`    |
+
+
+
 ### Run hook manually
 ```bash
 $ pre-commit run -a
