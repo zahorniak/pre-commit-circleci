@@ -7,7 +7,7 @@
 ```bash
 $ cat .pre-commit-config.yaml
 - repo: https://github.com/zahorniak/pre-commit-circleci.git
-  rev: v0.1 # get latest tag from release tab
+  rev: v0.2 # Ensure this is the latest tag, comparing to the Releases tab
   hooks:
     - id: circleci_validate
 ```
