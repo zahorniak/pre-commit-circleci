@@ -12,6 +12,20 @@ $ cat .pre-commit-config.yaml
     - id: circleci_validate
 ```
 
+If you wish to pass additional args to circleci_validate, you can specify
+them in the config. See `circleci config validate --help` for accepted args.
+
+For example, to set an org-slug:
+```bash
+$ cat .pre-commit-config.yaml
+- repo: https://github.com/zahorniak/pre-commit-circleci.git
+  rev: v0.3 # Ensure this is the latest tag, comparing to the Releases tab
+  hooks:
+    - id: circleci_validate
+      args:
+        - --org-slug my/organization
+```
+
 ## 3. Install hook
 ```bash
 $ pre-commit install
