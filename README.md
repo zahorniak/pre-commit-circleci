@@ -26,6 +26,17 @@ $ cat .pre-commit-config.yaml
         - --org-slug my/organization
 ```
 
+Or specify a custom config file:
+```bash
+$ cat .pre-commit-config.yaml
+- repo: https://github.com/zahorniak/pre-commit-circleci.git
+  rev: v0.5 # Ensure this is the latest tag, comparing to the Releases tab
+  hooks:
+    - id: circleci_validate
+      args:
+        - -c .circleci/continue_config.yml
+```
+
 ## 3. Install hook
 ```bash
 $ pre-commit install
