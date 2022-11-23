@@ -1,6 +1,6 @@
 - id: circleci_validate
   name: Validate CircleCI config
-  description: This hook validate CircleCI config
+  description: This hook validates CircleCI config
   entry: circleci_validate.sh
   language: script
   files: .circleci/.*.yml
