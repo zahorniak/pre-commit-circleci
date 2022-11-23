@@ -1,3 +1,10 @@
+# Overview
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/zahorniak/pre-commit-circleci?label=latest%20release)](https://github.com/zahorniak/pre-commit-circleci/releases/)
+[![GitHub Release Date - Published_At](https://img.shields.io/github/release-date/zahorniak/pre-commit-circleci)](https://github.com/zahorniak/pre-commit-circleci/releases/)
+
+[![issues - pre-commit-circleci](https://img.shields.io/github/issues/zahorniak/pre-commit-circleci)](https://github.com/zahorniak/pre-commit-circleci/issues)
+[![GitHub pull requests](https://img.shields.io/github/issues-pr/zahorniak/pre-commit-circleci)](https://github.com/zahorniak/pre-commit-circleci/pulls)
+
 # Usage
 ## 1. Install dependencies
 * [`pre-commit`](https://pre-commit.com/#install)
