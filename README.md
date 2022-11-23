@@ -14,6 +14,7 @@ $ cat .pre-commit-config.yaml
 
 If you wish to pass additional args to circleci_validate, you can specify
 them in the config. See `circleci config validate --help` for accepted args.
+You must use the form `--arg=value`, not `--arg value`.
 
 For example, to set an org-slug:
 ```bash
@@ -23,7 +24,7 @@ $ cat .pre-commit-config.yaml
   hooks:
     - id: circleci_validate
       args:
-        - --org-slug my/organization
+        - --org-slug=my/organization
 ```
 
 Or specify a custom config file:
@@ -34,7 +35,7 @@ $ cat .pre-commit-config.yaml
   hooks:
     - id: circleci_validate
       args:
-        - -c .circleci/continue_config.yml
+        - .circleci/continue_config.yml
 ```
 
 ## 3. Install hook
