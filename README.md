@@ -14,7 +14,7 @@
 ```bash
 $ cat .pre-commit-config.yaml
 - repo: https://github.com/zahorniak/pre-commit-circleci.git
-  rev: v0.5 # Ensure this is the latest tag, comparing to the Releases tab
+  rev: v0.6 # Ensure this is the latest tag, comparing to the Releases tab
   hooks:
     - id: circleci_validate
 ```
@@ -27,7 +27,7 @@ For example, to set an org-slug:
 ```bash
 $ cat .pre-commit-config.yaml
 - repo: https://github.com/zahorniak/pre-commit-circleci.git
-  rev: v0.5 # Ensure this is the latest tag, comparing to the Releases tab
+  rev: v0.6 # Ensure this is the latest tag, comparing to the Releases tab
   hooks:
     - id: circleci_validate
       args:
@@ -38,7 +38,7 @@ Or specify a custom config file:
 ```bash
 $ cat .pre-commit-config.yaml
 - repo: https://github.com/zahorniak/pre-commit-circleci.git
-  rev: v0.5 # Ensure this is the latest tag, comparing to the Releases tab
+  rev: v0.6 # Ensure this is the latest tag, comparing to the Releases tab
   hooks:
     - id: circleci_validate
       args:
