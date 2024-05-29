@@ -21,9 +21,8 @@ def main():
 
     # Validate CircleCI config
     try:
-        result = subprocess.run(
-            ["circleci", "config", "validate"], capture_output=True, text=True
-        )
+        command = ["circleci", "config", "validate"] + sys.argv[1:]
+        result = subprocess.run(command, capture_output=True, text=True)
         result.check_returncode()
         print("CircleCI Configuration Passed Validation.")
     except subprocess.CalledProcessError as e:
