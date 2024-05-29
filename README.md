@@ -1,3 +1,10 @@
+# Overview
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/zahorniak/pre-commit-circleci?label=latest%20release)](https://github.com/zahorniak/pre-commit-circleci/releases/)
+[![GitHub Release Date - Published_At](https://img.shields.io/github/release-date/zahorniak/pre-commit-circleci)](https://github.com/zahorniak/pre-commit-circleci/releases/)
+
+[![issues - pre-commit-circleci](https://img.shields.io/github/issues/zahorniak/pre-commit-circleci)](https://github.com/zahorniak/pre-commit-circleci/issues)
+[![GitHub pull requests](https://img.shields.io/github/issues-pr/zahorniak/pre-commit-circleci)](https://github.com/zahorniak/pre-commit-circleci/pulls)
+
 # Usage
 ## 1. Install dependencies
 * [`pre-commit`](https://pre-commit.com/#install)
@@ -7,23 +14,35 @@
 ```bash
 $ cat .pre-commit-config.yaml
 - repo: https://github.com/zahorniak/pre-commit-circleci.git
-  rev: v0.5 # Ensure this is the latest tag, comparing to the Releases tab
+  rev: v0.6 # Ensure this is the latest tag, comparing to the Releases tab
   hooks:
     - id: circleci_validate
 ```
 
 If you wish to pass additional args to circleci_validate, you can specify
 them in the config. See `circleci config validate --help` for accepted args.
+You must use the form `--arg=value`, not `--arg value`.
 
 For example, to set an org-slug:
 ```bash
 $ cat .pre-commit-config.yaml
 - repo: https://github.com/zahorniak/pre-commit-circleci.git
-  rev: v0.5 # Ensure this is the latest tag, comparing to the Releases tab
+  rev: v0.6 # Ensure this is the latest tag, comparing to the Releases tab
   hooks:
     - id: circleci_validate
       args:
-        - --org-slug my/organization
+        - --org-slug=my/organization
+```
+
+Or specify a custom config file:
+```bash
+$ cat .pre-commit-config.yaml
+- repo: https://github.com/zahorniak/pre-commit-circleci.git
+  rev: v0.6 # Ensure this is the latest tag, comparing to the Releases tab
+  hooks:
+    - id: circleci_validate
+      args:
+        - .circleci/continue_config.yml
 ```
 
 ## 3. Install hook
