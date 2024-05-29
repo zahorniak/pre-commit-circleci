@@ -1,7 +1,7 @@
 - id: circleci_validate
   name: Validate CircleCI config
   description: This hook validates CircleCI config
-  entry: circleci_validate.py
+  entry: circleci-validate
   language: python
   files: .circleci/.*.yml
   pass_filenames: false
