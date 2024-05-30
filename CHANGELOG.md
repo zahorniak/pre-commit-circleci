@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.0](https://github.com/zahorniak/pre-commit-circleci/compare/v1.0.0...v1.1.0) (2024-05-30)
+
+
+### Features
+
+* Migrate from Bash to Python ([#12](https://github.com/zahorniak/pre-commit-circleci/issues/12)) ([f105fdd](https://github.com/zahorniak/pre-commit-circleci/commit/f105fdd1b23f34d9e6a080050d23fb48abdb99ef))
+
 ## 1.0.0 (2024-05-29)
 
 
