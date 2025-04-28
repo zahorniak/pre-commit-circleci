@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-circleci_validate_process.py
+circleci_process.py
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A *pre-commit* hook that runs `circleci config process` on one or more

@@ -73,7 +73,7 @@ $ cat .pre-commit-config.yaml
 - repo: https://github.com/zahorniak/pre-commit-circleci.git
   rev: v1.1.0
   hooks:
-    - id: circleci_validate_process
+    - id: circleci_process
       args:
         - '--pipeline-parameters={"foo": "bar"}'
         - .circleci/config-1.yml
