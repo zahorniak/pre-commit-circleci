@@ -5,3 +5,10 @@
   language: python
   files: .circleci/.*.yml
   pass_filenames: false
+- id: circleci_process
+  name: Process CircleCI configuration
+  description: This hook process CircleCI configuration
+  entry: circleci-process
+  language: python
+  files: .circleci/.*.yml
+  pass_filenames: false
