@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.0](https://github.com/zahorniak/pre-commit-circleci/compare/v1.1.0...v1.2.0) (2025-04-28)
+
+
+### Features
+
+* Add circleci config process hook ([#15](https://github.com/zahorniak/pre-commit-circleci/issues/15)) ([3d71cb6](https://github.com/zahorniak/pre-commit-circleci/commit/3d71cb65a7bdcba1c00a310772c770bec69d31fa))
+
 ## [1.1.0](https://github.com/zahorniak/pre-commit-circleci/compare/v1.0.0...v1.1.0) (2024-05-30)
 
 
