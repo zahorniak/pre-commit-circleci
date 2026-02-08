@@ -3,12 +3,29 @@
   description: This hook validates CircleCI config
   entry: circleci-validate
   language: python
-  files: .circleci/.*.yml
+  files: ^\.circleci/.*\.ya?ml$
   pass_filenames: false
+
 - id: circleci_process
   name: Process CircleCI configuration
   description: This hook process CircleCI configuration
   entry: circleci-process
   language: python
-  files: .circleci/.*.yml
+  files: ^\.circleci/.*\.ya?ml$
+  pass_filenames: false
+
+- id: circleci_pack
+  name: Pack CircleCI configuration
+  description: This hook packs modular CircleCI config from src/ directory
+  entry: circleci-pack
+  language: python
+  files: ^\.circleci/src/.*\.ya?ml$
+  pass_filenames: false
+
+- id: circleci_pack_validate
+  name: Pack and validate CircleCI configuration
+  description: This hook packs and validates CircleCI dynamic configuration
+  entry: circleci-pack-validate
+  language: python
+  files: ^\.circleci/.*\.ya?ml$
   pass_filenames: false

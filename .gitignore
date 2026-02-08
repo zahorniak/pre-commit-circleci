@@ -1,2 +1,18 @@
 .idea
 .vscode
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+.venv/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/

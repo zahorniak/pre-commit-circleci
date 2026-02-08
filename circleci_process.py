@@ -13,8 +13,9 @@ Exit code:
 
 from __future__ import annotations
 
-import os
 import argparse
+import os
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -91,8 +92,16 @@ def main() -> None:
 
     # Check if running in CircleCI environment
     if os.getenv("CIRCLECI"):
-        print("Circleci environment detected, skipping validation.")
+        print("CircleCI environment detected, skipping processing.")
         sys.exit(0)
+
+    # Check if CircleCI CLI is installed
+    if not shutil.which("circleci"):
+        print(
+            "CircleCI CLI not found. Install: "
+            "https://circleci.com/docs/2.0/local-cli/#installation"
+        )
+        sys.exit(1)
 
     exit_code = 0
     for file_name in args.filenames:
