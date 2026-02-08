@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.0](https://github.com/zahorniak/pre-commit-circleci/compare/v1.2.0...v1.3.0) (2026-02-08)
+
+
+### Features
+
+* Add support for dynamic config ([#22](https://github.com/zahorniak/pre-commit-circleci/issues/22)) ([02bbbef](https://github.com/zahorniak/pre-commit-circleci/commit/02bbbef851a9abb83c5d6f96879a98f84b300a21))
+
 ## [1.2.0](https://github.com/zahorniak/pre-commit-circleci/compare/v1.1.0...v1.2.0) (2025-04-28)
 
 
