@@ -80,6 +80,66 @@ $ cat .pre-commit-config.yaml
         - .circleci/config-2.yml
 ```
 
+## Dynamic Configuration (Continuation Orb)
+
+For projects using CircleCI's dynamic configuration with the continuation orb
+and a modular `src/` directory structure, use the `circleci_pack_validate` hook:
+
+```bash
+$ cat .pre-commit-config.yaml
+- repo: https://github.com/zahorniak/pre-commit-circleci.git
+  rev: v2.0.0
+  hooks:
+    - id: circleci_pack_validate
+      args:
+        - --setup-config=.circleci/config.yml
+        - --src-dir=.circleci/src
+```
+
+This hook will:
+1. Validate the setup config (e.g., `.circleci/config.yml`)
+2. Pack the modular config from `src/` directory
+3. Validate the packed continuation config
+
+### Pack only (without validation)
+
+If you only need to pack the configuration:
+
+```bash
+$ cat .pre-commit-config.yaml
+- repo: https://github.com/zahorniak/pre-commit-circleci.git
+  rev: v2.0.0
+  hooks:
+    - id: circleci_pack
+      args:
+        - --src-dir=.circleci/src
+        - --output=.circleci/main-config.yml
+```
+
+### Skip setup or continuation validation
+
+You can skip either part of the validation:
+
+```bash
+$ cat .pre-commit-config.yaml
+- repo: https://github.com/zahorniak/pre-commit-circleci.git
+  rev: v2.0.0
+  hooks:
+    - id: circleci_pack_validate
+      args:
+        - --skip-setup  # Only validate the packed continuation config
+```
+
+```bash
+$ cat .pre-commit-config.yaml
+- repo: https://github.com/zahorniak/pre-commit-circleci.git
+  rev: v2.0.0
+  hooks:
+    - id: circleci_pack_validate
+      args:
+        - --skip-continuation  # Only validate the setup config
+```
+
 ## 3. Install hook
 
 ```bash
@@ -99,10 +159,12 @@ Process CircleCI configuration...........................................Passed
 
 ## How hook works
 
-| Hook                | Description                                                                  |
-| ------------------- | ---------------------------------------------------------------------------- |
-| `circleci_validate` | Validates CircleCI configuration using command `circleci config validate`    |
-| `circleci_process`  | Process the CircleCI configuration(s) using command`circleci config process` |
+| Hook                    | Description                                                                        |
+| ----------------------- | ---------------------------------------------------------------------------------- |
+| `circleci_validate`     | Validates CircleCI configuration using command `circleci config validate`          |
+| `circleci_process`      | Process the CircleCI configuration(s) using command `circleci config process`      |
+| `circleci_pack`         | Packs modular CircleCI config from src/ directory using `circleci config pack`     |
+| `circleci_pack_validate`| Packs and validates CircleCI dynamic configuration (for continuation orb setups)   |
 
 ### Run hook manually
 
