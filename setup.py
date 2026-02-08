@@ -18,4 +18,10 @@ setup(
             "circleci-pack-validate=circleci_pack_validate:main",
         ],
     },
+    extras_require={
+        "dev": [
+            "pytest>=7.0.0",
+        ],
+    },
+    python_requires=">=3.10",
 )

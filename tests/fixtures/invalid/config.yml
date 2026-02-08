@@ -1,0 +1,13 @@
+version: 2.1
+
+jobs:
+  build:
+    # Missing docker or machine executor - invalid config
+    steps:
+      - checkout
+
+workflows:
+  main:
+    jobs:
+      - build
+      - nonexistent_job # This job doesn't exist
