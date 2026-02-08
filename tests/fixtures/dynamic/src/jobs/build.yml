@@ -1,0 +1,7 @@
+docker:
+  - image: cimg/base:current
+steps:
+  - checkout
+  - run:
+      name: Build
+      command: echo "Building..."

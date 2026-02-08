@@ -1,0 +1,20 @@
+version: 2.1
+
+setup: true
+
+orbs:
+  continuation: circleci/continuation@1.0.0
+
+jobs:
+  generate-config:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - checkout
+      - continuation/continue:
+          configuration_path: .circleci/main-config.yml
+
+workflows:
+  setup-workflow:
+    jobs:
+      - generate-config

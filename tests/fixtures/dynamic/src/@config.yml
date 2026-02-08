@@ -1,0 +1,6 @@
+version: 2.1
+
+parameters:
+  run-tests:
+    type: boolean
+    default: true
