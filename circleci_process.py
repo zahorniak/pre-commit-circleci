@@ -92,7 +92,7 @@ def main() -> None:
 
     # Check if running in CircleCI environment
     if os.getenv("CIRCLECI"):
-        print("CircleCI environment detected, skipping validation.")
+        print("CircleCI environment detected, skipping processing.")
         sys.exit(0)
 
     # Check if CircleCI CLI is installed

@@ -20,7 +20,7 @@
 ```bash
 $ cat .pre-commit-config.yaml
 - repo: https://github.com/zahorniak/pre-commit-circleci.git
-  rev: v1.1.0 # Ensure this is the latest tag, comparing to the Releases tab
+  rev: v1.3.0 # Ensure this is the latest tag, comparing to the Releases tab
   hooks:
     - id: circleci_validate
 ```
@@ -30,7 +30,7 @@ $ cat .pre-commit-config.yaml
 ```bash
 $ cat .pre-commit-config.yaml
 - repo: https://github.com/zahorniak/pre-commit-circleci.git
-  rev: v1.1.0 # Ensure this is the latest tag, comparing to the Releases tab
+  rev: v1.3.0 # Ensure this is the latest tag, comparing to the Releases tab
   hooks:
     - id: circleci_process
 ```
@@ -45,7 +45,7 @@ For example, to set an org-slug:
 ```bash
 $ cat .pre-commit-config.yaml
 - repo: https://github.com/zahorniak/pre-commit-circleci.git
-  rev: v1.1.0 # Ensure this is the latest tag, comparing to the Releases tab
+  rev: v1.3.0 # Ensure this is the latest tag, comparing to the Releases tab
   hooks:
     - id: circleci_validate
       args:
@@ -57,7 +57,7 @@ Or specify a custom config file:
 ```bash
 $ cat .pre-commit-config.yaml
 - repo: https://github.com/zahorniak/pre-commit-circleci.git
-  rev: v1.1.0
+  rev: v1.3.0
   hooks:
     - id: circleci_validate
       args:
@@ -71,7 +71,7 @@ For example :
 ```bash
 $ cat .pre-commit-config.yaml
 - repo: https://github.com/zahorniak/pre-commit-circleci.git
-  rev: v1.1.0
+  rev: v1.3.0
   hooks:
     - id: circleci_process
       args:
@@ -88,7 +88,7 @@ and a modular `src/` directory structure, use the `circleci_pack_validate` hook:
 ```bash
 $ cat .pre-commit-config.yaml
 - repo: https://github.com/zahorniak/pre-commit-circleci.git
-  rev: v2.0.0
+  rev: v1.3.0
   hooks:
     - id: circleci_pack_validate
       args:
@@ -108,7 +108,7 @@ If you only need to pack the configuration:
 ```bash
 $ cat .pre-commit-config.yaml
 - repo: https://github.com/zahorniak/pre-commit-circleci.git
-  rev: v2.0.0
+  rev: v1.3.0
   hooks:
     - id: circleci_pack
       args:
@@ -123,7 +123,7 @@ You can skip either part of the validation:
 ```bash
 $ cat .pre-commit-config.yaml
 - repo: https://github.com/zahorniak/pre-commit-circleci.git
-  rev: v2.0.0
+  rev: v1.3.0
   hooks:
     - id: circleci_pack_validate
       args:
@@ -133,7 +133,7 @@ $ cat .pre-commit-config.yaml
 ```bash
 $ cat .pre-commit-config.yaml
 - repo: https://github.com/zahorniak/pre-commit-circleci.git
-  rev: v2.0.0
+  rev: v1.3.0
   hooks:
     - id: circleci_pack_validate
       args:
