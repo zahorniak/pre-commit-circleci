@@ -65,9 +65,13 @@ def mock_circleci_not_installed() -> Generator[MagicMock, None, None]:
 @pytest.fixture
 def mock_circleci_env() -> Generator[None, None, None]:
     """Set CIRCLECI environment variable."""
+    original_value = os.environ.get("CIRCLECI")
     os.environ["CIRCLECI"] = "true"
     yield
-    del os.environ["CIRCLECI"]
+    if original_value is None:
+        os.environ.pop("CIRCLECI", None)
+    else:
+        os.environ["CIRCLECI"] = original_value
 
 
 @pytest.fixture
