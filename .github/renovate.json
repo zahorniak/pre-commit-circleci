@@ -1,7 +1,13 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:base", ":semanticCommits"],
-  "enabledManagers": ["github-actions", "pip_setup"],
+  "extends": [
+    "config:recommended",
+    ":semanticCommits"
+  ],
+  "enabledManagers": [
+    "github-actions",
+    "pip_setup"
+  ],
   "reviewersFromCodeOwners": true,
   "dependencyDashboard": true
 }
