@@ -10,6 +10,10 @@ on:
       - '**/*.yaml'
       - '.github/workflows/release.yml'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   release:
     name: Release
@@ -18,13 +22,13 @@ jobs:
     if: github.repository_owner == 'zahorniak'
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.1.0
         with:
           persist-credentials: false
           fetch-depth: 0
 
       - name: Release
-        uses: cycjimmy/semantic-release-action@v6
+        uses: cycjimmy/semantic-release-action@b12c8f6015dc215fe37bc154d4ad456dd3833c90 # v6.0.0
         with:
           semantic_version: 23.0.2
           extra_plugins: |
