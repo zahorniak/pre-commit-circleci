@@ -19,6 +19,6 @@ We ask that you do not disclose the issue publicly until we have had a chance to
 | Version | Supported          |
 | ------- | ------------------ |
 | Latest  | :white_check_mark: |
-| < Latest| :x:                |
+| < Latest | :x:                |
 
 Only the latest version of this pre-commit hook receives security updates.
