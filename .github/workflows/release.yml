@@ -6,9 +6,9 @@ on:
     branches:
       - master
     paths:
-      - '**/*.py'
-      - '**/*.yaml'
-      - '.github/workflows/release.yml'
+      - "**/*.py"
+      - "**/*.yaml"
+      - ".github/workflows/release.yml"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -22,7 +22,7 @@ jobs:
     if: github.repository_owner == 'zahorniak'
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.1.0
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
           fetch-depth: 0
