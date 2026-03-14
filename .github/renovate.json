@@ -9,5 +9,7 @@
     "pip_setup"
   ],
   "reviewersFromCodeOwners": true,
-  "dependencyDashboard": true
+  "dependencyDashboard": true,
+  "commitMessageLowerCase": "never",
+  "minimumReleaseAge": "30 days"
 }
