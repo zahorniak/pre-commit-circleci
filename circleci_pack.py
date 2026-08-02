@@ -19,6 +19,8 @@ import shutil
 import subprocess
 import sys
 
+from circleci_cli import CLI_INSTALL_URL
+
 
 def parse_args() -> argparse.Namespace:
     """Return parsed CLI arguments."""
@@ -36,11 +38,11 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--org-slug",
-        help="Organization slug for private orbs (e.g., github/example-org)",
+        help="deprecated, ignored: circleci config pack accepts no org flags",
     )
     parser.add_argument(
         "--org-id",
-        help="Organization ID for private orbs",
+        help="deprecated, ignored: circleci config pack accepts no org flags",
     )
     return parser.parse_args()
 
@@ -56,10 +58,7 @@ def main() -> None:
 
     # Check CLI availability
     if not shutil.which("circleci"):
-        print(
-            "CircleCI CLI not found. Install: "
-            "https://circleci.com/docs/2.0/local-cli/#installation"
-        )
+        print(f"CircleCI CLI not found. Install: {CLI_INSTALL_URL}")
         sys.exit(1)
 
     # Verify src-dir exists
@@ -67,12 +66,17 @@ def main() -> None:
         print(f"Source directory not found: {args.src_dir}")
         sys.exit(1)
 
+    # `circleci config pack` accepts no org flags on any CLI
+    # generation. Warn and ignore them.
+    if args.org_slug or args.org_id:
+        print(
+            "Warning: `circleci config pack` accepts no org flags; "
+            "--org-slug/--org-id ignored.",
+            file=sys.stderr,
+        )
+
     # Build command
     cmd: list[str] = ["circleci", "config", "pack", args.src_dir]
-    if args.org_slug:
-        cmd.append(f"--org-slug={args.org_slug}")
-    if args.org_id:
-        cmd.append(f"--org-id={args.org_id}")
 
     # Run pack
     result = subprocess.run(cmd, capture_output=True, text=True, check=False)
