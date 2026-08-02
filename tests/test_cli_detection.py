@@ -56,6 +56,12 @@ class TestIsCliV1:
         env = mock_run.call_args.kwargs["env"]
         assert env["CIRCLECI_CLI_SKIP_UPDATE_CHECK"] == "true"
 
+    def test_version_on_stderr_detects_v1(self) -> None:
+        result = _version_result("")
+        result.stderr = V1_VERSION_OUTPUT
+        with patch("subprocess.run", return_value=result):
+            assert circleci_cli.is_cli_v1() is True
+
 
 class TestBuildValidateCmd:
     """Tests for the validate command builder."""

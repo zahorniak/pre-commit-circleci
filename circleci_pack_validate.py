@@ -20,7 +20,7 @@ import subprocess
 import sys
 import tempfile
 
-from circleci_cli import CLI_INSTALL_URL, build_validate_cmd
+from circleci_cli import CLI_INSTALL_URL, build_validate_cmd, cli_env
 
 
 def validate_config(
@@ -36,14 +36,18 @@ def validate_config(
         org_slug=org_slug,
         org_id=org_id,
     )
-    result = subprocess.run(cmd, capture_output=True, text=True, check=False)
+    result = subprocess.run(
+        cmd, capture_output=True, text=True, check=False, env=cli_env()
+    )
     return result.returncode, result.stdout, result.stderr
 
 
 def pack_config(src_dir: str, output_path: str) -> tuple[int, str, str]:
     """Run circleci config pack and return exit code, stdout, stderr."""
     cmd: list[str] = ["circleci", "config", "pack", src_dir]
-    result = subprocess.run(cmd, capture_output=True, text=True, check=False)
+    result = subprocess.run(
+        cmd, capture_output=True, text=True, check=False, env=cli_env()
+    )
 
     if result.returncode == 0:
         with open(output_path, "w") as f:

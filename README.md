@@ -11,7 +11,7 @@
 ## 1. Install dependencies
 
 - [`pre-commit`](https://pre-commit.com/#install)
-- [`circleci-cli`](https://cli.circleci.com/) — CLI v1 or the legacy 0.1.x CLI
+- [`circleci-cli`](https://cli.circleci.com/) — CLI v1, or the [legacy 0.1.x CLI](https://circleci.com/docs/guides/toolkit/local-cli/)
 
 ### CLI version support
 
@@ -30,6 +30,9 @@ detect the installed CLI generation and translate the hook arguments:
 **Note:** CLI v1 requires an API token for `validate` and `process`.
 Set the token with `circleci auth login` or with the `CIRCLE_TOKEN`
 environment variable.
+
+Unknown flags pass through to the CLI unchanged. Use the form
+`--flag=value`, not `--flag value`.
 
 ## 2. Create config file _.pre-commit-config.yaml_ with content:
 

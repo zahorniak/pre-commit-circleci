@@ -21,7 +21,7 @@ import shutil
 import subprocess
 import sys
 
-from circleci_cli import CLI_INSTALL_URL, build_validate_cmd
+from circleci_cli import CLI_INSTALL_URL, build_validate_cmd, cli_env
 
 
 def parse_args() -> tuple[argparse.Namespace, list[str]]:
@@ -77,7 +77,9 @@ def main() -> None:
         verbose=args.verbose,
         extra=extra,
     )
-    result = subprocess.run(cmd, capture_output=True, text=True, check=False)
+    result = subprocess.run(
+        cmd, capture_output=True, text=True, check=False, env=cli_env()
+    )
     if result.returncode == 0:
         print("CircleCI Configuration Passed Validation.")
     else:

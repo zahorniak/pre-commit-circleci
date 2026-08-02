@@ -23,7 +23,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from circleci_cli import CLI_INSTALL_URL, build_process_cmd
+from circleci_cli import CLI_INSTALL_URL, build_process_cmd, cli_env
 
 
 def run_process(
@@ -45,7 +45,9 @@ def run_process(
         verbose=verbose,
         extra=extra,
     )
-    completed = subprocess.run(cmd, text=True, capture_output=True, check=False)
+    completed = subprocess.run(
+        cmd, text=True, capture_output=True, check=False, env=cli_env()
+    )
     if completed.returncode == 0:
         # Hide the CircleCI output on success.
         print(f"✅  CircleCI configuration passed processing: {config_path}")

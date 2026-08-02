@@ -19,7 +19,7 @@ import shutil
 import subprocess
 import sys
 
-from circleci_cli import CLI_INSTALL_URL
+from circleci_cli import CLI_INSTALL_URL, cli_env
 
 
 def parse_args() -> argparse.Namespace:
@@ -79,7 +79,9 @@ def main() -> None:
     cmd: list[str] = ["circleci", "config", "pack", args.src_dir]
 
     # Run pack
-    result = subprocess.run(cmd, capture_output=True, text=True, check=False)
+    result = subprocess.run(
+        cmd, capture_output=True, text=True, check=False, env=cli_env()
+    )
 
     if result.returncode != 0:
         print(f"Failed to pack configuration from {args.src_dir}")

@@ -29,6 +29,17 @@ _IS_V1: bool | None = None
 _VERSION_RE = re.compile(r"(\d+)\.\d+")
 
 
+def cli_env() -> dict[str, str]:
+    """Return the environment for CircleCI CLI subprocess calls.
+
+    The variable skips the slow update check of the legacy CLI.
+    CLI v1 ignores the variable.
+    """
+    env = dict(os.environ)
+    env["CIRCLECI_CLI_SKIP_UPDATE_CHECK"] = "true"
+    return env
+
+
 def is_cli_v1() -> bool:
     """Return True when the installed CLI is v1 or later.
 
@@ -43,21 +54,19 @@ def is_cli_v1() -> bool:
 
 def _detect_cli_v1() -> bool:
     """Run `circleci version` and parse the major version."""
-    env = dict(os.environ)
-    # Skip the slow update check of the legacy CLI. CLI v1 ignores
-    # this variable.
-    env["CIRCLECI_CLI_SKIP_UPDATE_CHECK"] = "true"
     try:
         result = subprocess.run(
             ["circleci", "version"],
             capture_output=True,
             text=True,
             check=False,
-            env=env,
+            env=cli_env(),
         )
     except OSError:
         return False
-    match = _VERSION_RE.search(result.stdout)
+    # Read the version number from stdout and stderr. A future CLI
+    # build may print the version banner to stderr.
+    match = _VERSION_RE.search(result.stdout + result.stderr)
     if not match:
         return False
     return int(match.group(1)) >= 1
