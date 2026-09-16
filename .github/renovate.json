@@ -6,10 +6,35 @@
   ],
   "enabledManagers": [
     "github-actions",
-    "pip_setup"
+    "pip_setup",
+    "custom.regex"
   ],
   "reviewersFromCodeOwners": true,
   "dependencyDashboard": true,
   "commitMessageLowerCase": "never",
-  "minimumReleaseAge": "30 days"
+  "minimumReleaseAge": "30 days",
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Update npm packages pinned in the extra_plugins block of the release workflow",
+      "managerFilePatterns": [
+        "/^\\.github/workflows/release\\.yml$/"
+      ],
+      "matchStrings": [
+        "\\s+(?<depName>@?[\\w./-]+)@(?<currentValue>\\d+\\.\\d+\\.\\d+)\\n"
+      ],
+      "datasourceTemplate": "npm"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "Update semantic-release and its plugins together, so plugin majors stay compatible with the core",
+      "groupName": "semantic-release",
+      "matchPackageNames": [
+        "semantic-release",
+        "@semantic-release/**",
+        "conventional-changelog-conventionalcommits"
+      ]
+    }
+  ]
 }
