@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 """
 circleci_process.py
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 
 A *pre-commit* hook that runs `circleci config process` on one or more
 CircleCI configuration files.
+
+The hook supports the legacy CLI (0.1.x) and CLI v1. It translates
+the org and verbose arguments for the detected generation.
 
 Exit code:
   * 0  - all configs processed successfully
@@ -20,38 +23,42 @@ import subprocess
 import sys
 from pathlib import Path
 
+from circleci_cli import CLI_INSTALL_URL, build_process_cmd, cli_env
+
 
 def run_process(
     config_path: Path,
+    org: str | None,
     org_slug: str | None,
     org_id: str | None,
     pipeline_params: str | None,
     verbose: bool,
+    extra: list[str],
 ) -> int:
     """Run `circleci config process` and return its exit code."""
-    cmd: list[str] = ["circleci", "config", "process", str(config_path)]
-
-    if org_slug:
-        cmd.append(f"--org-slug={org_slug}")
-    if org_id:
-        cmd.append(f"--org-id={org_id}")
-    if pipeline_params:
-        cmd.append(f"--pipeline-parameters={pipeline_params}")
-    if verbose:
-        cmd.append("--verbose")
-
-    completed = subprocess.run(cmd, text=True, capture_output=True, check=False)
+    cmd = build_process_cmd(
+        path=str(config_path),
+        org=org,
+        org_slug=org_slug,
+        org_id=org_id,
+        pipeline_parameters=pipeline_params,
+        verbose=verbose,
+        extra=extra,
+    )
+    completed = subprocess.run(
+        cmd, text=True, capture_output=True, check=False, env=cli_env()
+    )
     if completed.returncode == 0:
-        # Hide verbose CircleCI output on success
+        # Hide the CircleCI output on success.
         print(f"✅  CircleCI configuration passed processing: {config_path}")
     else:
-        # Re-emit CircleCI output so the user can see the problem
+        # Show the CircleCI output so the user can see the problem.
         sys.stderr.write(completed.stdout + completed.stderr)
     return completed.returncode
 
 
-def parse_args() -> argparse.Namespace:  # noqa: D401
-    """Return parsed CLI arguments."""
+def parse_args() -> tuple[argparse.Namespace, list[str]]:
+    """Return the parsed known arguments and the unknown remainder."""
     parser = argparse.ArgumentParser(
         description=(
             "Run `circleci config process` against the given file(s) inside pre-commit."
@@ -66,6 +73,10 @@ def parse_args() -> argparse.Namespace:  # noqa: D401
         help="organization ID for private orbs",
     )
     parser.add_argument(
+        "--org",
+        help="organization slug or ID (CLI v1 style) for private orbs",
+    )
+    parser.add_argument(
         "--pipeline-parameters",
         help=(
             "YAML/JSON string or file path with pipeline parameters "
@@ -75,32 +86,28 @@ def parse_args() -> argparse.Namespace:  # noqa: D401
     parser.add_argument(
         "--verbose",
         action="store_true",
-        help="pass --verbose through to the CircleCI CLI "
-        "(for failing operations in that implementation)",
+        help="verbose CLI output (--verbose on legacy, --debug on CLI v1)",
     )
     parser.add_argument(
         "filenames",
         nargs="+",
         help="config files to check",
     )
-    return parser.parse_args()
+    return parser.parse_known_args()
 
 
 def main() -> None:
     """Entry-point for the pre-commit hook."""
-    args = parse_args()
+    args, extra = parse_args()
 
-    # Check if running in CircleCI environment
+    # Skip the hook in the CircleCI environment.
     if os.getenv("CIRCLECI"):
         print("CircleCI environment detected, skipping processing.")
         sys.exit(0)
 
-    # Check if CircleCI CLI is installed
+    # Stop when the CircleCI CLI is not installed.
     if not shutil.which("circleci"):
-        print(
-            "CircleCI CLI not found. Install: "
-            "https://circleci.com/docs/2.0/local-cli/#installation"
-        )
+        print(f"CircleCI CLI not found. Install: {CLI_INSTALL_URL}")
         sys.exit(1)
 
     exit_code = 0
@@ -112,10 +119,12 @@ def main() -> None:
 
         ret = run_process(
             config_path=path,
+            org=args.org,
             org_slug=args.org_slug,
             org_id=args.org_id,
             pipeline_params=args.pipeline_parameters,
             verbose=args.verbose,
+            extra=extra,
         )
         exit_code = max(exit_code, ret)
 

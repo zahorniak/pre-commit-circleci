@@ -76,6 +76,7 @@ class TestMain:
         assert exc_info.value.code == 1
         captured = capsys.readouterr()
         assert "CircleCI CLI not found" in captured.out
+        assert "https://cli.circleci.com/" in captured.out
 
     def test_fails_when_src_dir_not_found(
         self,
@@ -95,6 +96,7 @@ class TestMain:
         self,
         mock_circleci_installed: MagicMock,
         mock_subprocess_pack_success: MagicMock,
+        mock_cli_legacy: MagicMock,
         dynamic_src_dir: Path,
         capsys: pytest.CaptureFixture[str],
     ) -> None:
@@ -149,13 +151,15 @@ class TestMain:
         finally:
             Path(output_path).unlink(missing_ok=True)
 
-    def test_includes_org_slug(
+    def test_org_slug_not_forwarded(
         self,
         mock_circleci_installed: MagicMock,
         mock_subprocess_pack_success: MagicMock,
+        mock_cli_legacy: MagicMock,
         dynamic_src_dir: Path,
+        capsys: pytest.CaptureFixture[str],
     ) -> None:
-        """Test that org-slug is included in command."""
+        """Test that org-slug is not forwarded and a warning is printed."""
         with patch(
             "sys.argv",
             ["circleci_pack", f"--src-dir={dynamic_src_dir}", "--org-slug=github/org"],
@@ -164,15 +168,18 @@ class TestMain:
                 circleci_pack.main()
 
         call_args = mock_subprocess_pack_success.call_args[0][0]
-        assert "--org-slug=github/org" in call_args
+        assert "--org-slug=github/org" not in call_args
+        assert "accepts no org flags" in capsys.readouterr().err
 
-    def test_includes_org_id(
+    def test_org_id_not_forwarded(
         self,
         mock_circleci_installed: MagicMock,
         mock_subprocess_pack_success: MagicMock,
+        mock_cli_legacy: MagicMock,
         dynamic_src_dir: Path,
+        capsys: pytest.CaptureFixture[str],
     ) -> None:
-        """Test that org-id is included in command."""
+        """Test that org-id is not forwarded and a warning is printed."""
         with patch(
             "sys.argv",
             ["circleci_pack", f"--src-dir={dynamic_src_dir}", "--org-id=12345"],
@@ -181,7 +188,8 @@ class TestMain:
                 circleci_pack.main()
 
         call_args = mock_subprocess_pack_success.call_args[0][0]
-        assert "--org-id=12345" in call_args
+        assert "--org-id=12345" not in call_args
+        assert "accepts no org flags" in capsys.readouterr().err
 
     def test_fails_on_pack_error(
         self,
@@ -198,3 +206,34 @@ class TestMain:
         assert exc_info.value.code == 1
         captured = capsys.readouterr()
         assert "Failed to pack configuration" in captured.out
+
+    def test_org_flags_warn_and_are_not_forwarded(
+        self,
+        mock_circleci_installed: MagicMock,
+        mock_cli_legacy: MagicMock,
+        dynamic_src_dir: Path,
+        capsys: pytest.CaptureFixture[str],
+    ) -> None:
+        with patch("subprocess.run") as mock_run:
+            mock_result = MagicMock()
+            mock_result.returncode = 0
+            mock_result.stdout = "packed: yes"
+            mock_result.stderr = ""
+            mock_run.return_value = mock_result
+
+            with patch(
+                "sys.argv",
+                [
+                    "circleci_pack",
+                    "--src-dir",
+                    str(dynamic_src_dir),
+                    "--org-slug=github/my-org",
+                ],
+            ):
+                with pytest.raises(SystemExit) as exc_info:
+                    circleci_pack.main()
+
+        assert exc_info.value.code == 0
+        cmd = mock_run.call_args[0][0]
+        assert "--org-slug=github/my-org" not in cmd
+        assert "accepts no org flags" in capsys.readouterr().err

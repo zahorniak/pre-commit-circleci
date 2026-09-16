@@ -11,7 +11,28 @@
 ## 1. Install dependencies
 
 - [`pre-commit`](https://pre-commit.com/#install)
-- [`circleci-cli`](https://circleci.com/docs/2.0/local-cli/#installation)
+- [`circleci-cli`](https://cli.circleci.com/) — CLI v1, or the [legacy 0.1.x CLI](https://circleci.com/docs/guides/toolkit/local-cli/)
+
+### CLI version support
+
+The hooks support the legacy CLI (0.1.x) and CLI v1. Download CLI v1
+from the [CircleCI CLI page](https://cli.circleci.com/). The hooks
+detect the installed CLI generation and translate the hook arguments:
+
+| Hook argument           | Legacy CLI (0.1.x)          | CLI v1            |
+| ----------------------- | --------------------------- | ----------------- |
+| config path (validate)  | positional path             | `--config <path>` |
+| `--org-slug=<slug>`     | `--org-slug=<slug>`         | `--org <slug>`    |
+| `--org-id=<uuid>`       | `--org-id=<uuid>`           | `--org <uuid>`    |
+| `--org=<slug-or-uuid>`  | `--org-slug` or `--org-id`  | `--org <value>`   |
+| `--verbose`             | `--verbose`                 | `--debug`         |
+
+**Note:** CLI v1 requires an API token for `validate` and `process`.
+Set the token with `circleci auth login` or with the `CIRCLE_TOKEN`
+environment variable.
+
+Unknown flags pass through to the CLI unchanged. Use the form
+`--flag=value`, not `--flag value`.
 
 ## 2. Create config file _.pre-commit-config.yaml_ with content:
 

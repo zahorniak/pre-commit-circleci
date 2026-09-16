@@ -20,27 +20,34 @@ import subprocess
 import sys
 import tempfile
 
+from circleci_cli import CLI_INSTALL_URL, build_validate_cmd, cli_env
+
 
 def validate_config(
     config_path: str,
+    org: str | None,
     org_slug: str | None,
     org_id: str | None,
 ) -> tuple[int, str, str]:
-    """Run circleci config validate and return exit code, stdout, stderr."""
-    cmd: list[str] = ["circleci", "config", "validate", config_path]
-    if org_slug:
-        cmd.append(f"--org-slug={org_slug}")
-    if org_id:
-        cmd.append(f"--org-id={org_id}")
-
-    result = subprocess.run(cmd, capture_output=True, text=True, check=False)
+    """Run `circleci config validate` and return exit code, stdout, stderr."""
+    cmd = build_validate_cmd(
+        path=config_path,
+        org=org,
+        org_slug=org_slug,
+        org_id=org_id,
+    )
+    result = subprocess.run(
+        cmd, capture_output=True, text=True, check=False, env=cli_env()
+    )
     return result.returncode, result.stdout, result.stderr
 
 
 def pack_config(src_dir: str, output_path: str) -> tuple[int, str, str]:
     """Run circleci config pack and return exit code, stdout, stderr."""
     cmd: list[str] = ["circleci", "config", "pack", src_dir]
-    result = subprocess.run(cmd, capture_output=True, text=True, check=False)
+    result = subprocess.run(
+        cmd, capture_output=True, text=True, check=False, env=cli_env()
+    )
 
     if result.returncode == 0:
         with open(output_path, "w") as f:
@@ -82,6 +89,10 @@ def parse_args() -> argparse.Namespace:
         "--org-id",
         help="Organization ID for private orbs",
     )
+    parser.add_argument(
+        "--org",
+        help="organization slug or ID (CLI v1 style) for private orbs",
+    )
     return parser.parse_args()
 
 
@@ -96,10 +107,7 @@ def main() -> None:
 
     # Check CLI availability
     if not shutil.which("circleci"):
-        print(
-            "CircleCI CLI not found. Install: "
-            "https://circleci.com/docs/2.0/local-cli/#installation"
-        )
+        print(f"CircleCI CLI not found. Install: {CLI_INSTALL_URL}")
         sys.exit(1)
 
     exit_code = 0
@@ -112,7 +120,7 @@ def main() -> None:
 
         print(f"Validating setup config: {args.setup_config}")
         ret, stdout, stderr = validate_config(
-            args.setup_config, args.org_slug, args.org_id
+            args.setup_config, args.org, args.org_slug, args.org_id
         )
         if ret == 0:
             print("  Setup configuration passed validation.")
@@ -145,7 +153,7 @@ def main() -> None:
                     print("  Packed successfully.")
                     print("Validating continuation config...")
                     ret, stdout, stderr = validate_config(
-                        tmp_path, args.org_slug, args.org_id
+                        tmp_path, args.org, args.org_slug, args.org_id
                     )
                     if ret == 0:
                         print("  Continuation configuration passed validation.")
