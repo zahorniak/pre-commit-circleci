@@ -30,10 +30,8 @@ jobs:
       - name: Release
         uses: cycjimmy/semantic-release-action@b12c8f6015dc215fe37bc154d4ad456dd3833c90 # v6.0.0
         with:
-          semantic_version: 23.0.2
+          semantic_version: 25.0.9
           extra_plugins: |
-            @semantic-release/changelog@6.0.3
-            @semantic-release/git@10.0.1
-            conventional-changelog-conventionalcommits@7.0.2
+            conventional-changelog-conventionalcommits@9.3.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
