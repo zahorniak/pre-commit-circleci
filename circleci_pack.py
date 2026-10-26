@@ -58,7 +58,7 @@ def main() -> None:
     if not shutil.which("circleci"):
         print(
             "CircleCI CLI not found. Install: "
-            "https://circleci.com/docs/2.0/local-cli/#installation"
+            "https://circleci.com/docs/guides/toolkit/circleci-cli/"
         )
         sys.exit(1)
 

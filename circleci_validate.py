@@ -15,7 +15,7 @@ def main():
     # Check if CircleCI CLI is installed
     if not shutil.which("circleci"):
         print(
-            "Circleci CLI could not be found. Install the latest CLI version https://circleci.com/docs/2.0/local-cli/#installation"
+            "Circleci CLI could not be found. Install the latest CLI version https://circleci.com/docs/guides/toolkit/circleci-cli/"
         )
         sys.exit(1)
 
