@@ -16,15 +16,18 @@ class TestRunProcess:
     def test_runs_process_command(
         self,
         mock_subprocess_success: MagicMock,
+        mock_cli_legacy: MagicMock,
         simple_config: Path,
     ) -> None:
         """Test that circleci config process is called correctly."""
         result = circleci_process.run_process(
             config_path=simple_config,
+            org=None,
             org_slug=None,
             org_id=None,
             pipeline_params=None,
             verbose=False,
+            extra=[],
         )
 
         assert result == 0
@@ -35,15 +38,18 @@ class TestRunProcess:
     def test_includes_org_slug(
         self,
         mock_subprocess_success: MagicMock,
+        mock_cli_legacy: MagicMock,
         simple_config: Path,
     ) -> None:
         """Test that org-slug is included in command."""
         circleci_process.run_process(
             config_path=simple_config,
+            org=None,
             org_slug="github/my-org",
             org_id=None,
             pipeline_params=None,
             verbose=False,
+            extra=[],
         )
 
         call_args = mock_subprocess_success.call_args[0][0]
@@ -52,15 +58,18 @@ class TestRunProcess:
     def test_includes_org_id(
         self,
         mock_subprocess_success: MagicMock,
+        mock_cli_legacy: MagicMock,
         simple_config: Path,
     ) -> None:
         """Test that org-id is included in command."""
         circleci_process.run_process(
             config_path=simple_config,
+            org=None,
             org_slug=None,
             org_id="12345",
             pipeline_params=None,
             verbose=False,
+            extra=[],
         )
 
         call_args = mock_subprocess_success.call_args[0][0]
@@ -69,15 +78,18 @@ class TestRunProcess:
     def test_includes_pipeline_parameters(
         self,
         mock_subprocess_success: MagicMock,
+        mock_cli_legacy: MagicMock,
         simple_config: Path,
     ) -> None:
         """Test that pipeline-parameters is included in command."""
         circleci_process.run_process(
             config_path=simple_config,
+            org=None,
             org_slug=None,
             org_id=None,
             pipeline_params='{"foo": "bar"}',
             verbose=False,
+            extra=[],
         )
 
         call_args = mock_subprocess_success.call_args[0][0]
@@ -86,15 +98,18 @@ class TestRunProcess:
     def test_includes_verbose_flag(
         self,
         mock_subprocess_success: MagicMock,
+        mock_cli_legacy: MagicMock,
         simple_config: Path,
     ) -> None:
         """Test that verbose flag is included in command."""
         circleci_process.run_process(
             config_path=simple_config,
+            org=None,
             org_slug=None,
             org_id=None,
             pipeline_params=None,
             verbose=True,
+            extra=[],
         )
 
         call_args = mock_subprocess_success.call_args[0][0]
@@ -108,10 +123,12 @@ class TestRunProcess:
         """Test that exit code is returned on failure."""
         result = circleci_process.run_process(
             config_path=simple_config,
+            org=None,
             org_slug=None,
             org_id=None,
             pipeline_params=None,
             verbose=False,
+            extra=[],
         )
 
         assert result == 1
@@ -123,18 +140,19 @@ class TestParseArgs:
     def test_parses_single_file(self) -> None:
         """Test parsing a single config file."""
         with patch("sys.argv", ["circleci_process", "config.yml"]):
-            args = circleci_process.parse_args()
+            args, extra = circleci_process.parse_args()
 
         assert args.filenames == ["config.yml"]
         assert args.org_slug is None
         assert args.org_id is None
         assert args.pipeline_parameters is None
         assert args.verbose is False
+        assert extra == []
 
     def test_parses_multiple_files(self) -> None:
         """Test parsing multiple config files."""
         with patch("sys.argv", ["circleci_process", "config1.yml", "config2.yml"]):
-            args = circleci_process.parse_args()
+            args, extra = circleci_process.parse_args()
 
         assert args.filenames == ["config1.yml", "config2.yml"]
 
@@ -151,7 +169,7 @@ class TestParseArgs:
                 "config.yml",
             ],
         ):
-            args = circleci_process.parse_args()
+            args, extra = circleci_process.parse_args()
 
         assert args.org_slug == "github/org"
         assert args.org_id == "123"
@@ -186,6 +204,7 @@ class TestMain:
         assert exc_info.value.code == 1
         captured = capsys.readouterr()
         assert "CircleCI CLI not found" in captured.out
+        assert "https://cli.circleci.com/" in captured.out
 
     def test_processes_single_file_successfully(
         self,
@@ -207,6 +226,7 @@ class TestMain:
         self,
         mock_circleci_installed: MagicMock,
         mock_subprocess_success: MagicMock,
+        mock_cli_legacy: MagicMock,
         simple_config: Path,
         capsys: pytest.CaptureFixture[str],
     ) -> None:
@@ -264,3 +284,94 @@ class TestMain:
                     circleci_process.main()
 
         assert exc_info.value.code == 1
+
+
+class TestCliV1:
+    """Tests for CLI v1 command translation."""
+
+    def _success_result(self) -> MagicMock:
+        result = MagicMock()
+        result.returncode = 0
+        result.stdout = "processed"
+        result.stderr = ""
+        return result
+
+    def test_v1_translates_org_slug(
+        self,
+        mock_circleci_installed: MagicMock,
+        mock_cli_v1: MagicMock,
+        simple_config: Path,
+    ) -> None:
+        with patch("subprocess.run", return_value=self._success_result()) as mock_run:
+            with patch(
+                "sys.argv",
+                [
+                    "circleci_process",
+                    "--org-slug=github/my-org",
+                    str(simple_config),
+                ],
+            ):
+                with pytest.raises(SystemExit) as exc_info:
+                    circleci_process.main()
+
+        assert exc_info.value.code == 0
+        cmd = mock_run.call_args[0][0]
+        assert "--org=github/my-org" in cmd
+        assert "--org-slug=github/my-org" not in cmd
+
+    def test_v1_keeps_pipeline_parameters(
+        self,
+        mock_circleci_installed: MagicMock,
+        mock_cli_v1: MagicMock,
+        simple_config: Path,
+    ) -> None:
+        with patch("subprocess.run", return_value=self._success_result()) as mock_run:
+            with patch(
+                "sys.argv",
+                [
+                    "circleci_process",
+                    '--pipeline-parameters={"foo": "bar"}',
+                    str(simple_config),
+                ],
+            ):
+                with pytest.raises(SystemExit) as exc_info:
+                    circleci_process.main()
+
+        assert exc_info.value.code == 0
+        assert '--pipeline-parameters={"foo": "bar"}' in mock_run.call_args[0][0]
+
+    def test_v1_verbose_maps_to_debug(
+        self,
+        mock_circleci_installed: MagicMock,
+        mock_cli_v1: MagicMock,
+        simple_config: Path,
+    ) -> None:
+        with patch("subprocess.run", return_value=self._success_result()) as mock_run:
+            with patch(
+                "sys.argv",
+                ["circleci_process", "--verbose", str(simple_config)],
+            ):
+                with pytest.raises(SystemExit) as exc_info:
+                    circleci_process.main()
+
+        assert exc_info.value.code == 0
+        cmd = mock_run.call_args[0][0]
+        assert "--debug" in cmd
+        assert "--verbose" not in cmd
+
+    def test_legacy_translates_org_flag(
+        self,
+        mock_circleci_installed: MagicMock,
+        mock_cli_legacy: MagicMock,
+        simple_config: Path,
+    ) -> None:
+        with patch("subprocess.run", return_value=self._success_result()) as mock_run:
+            with patch(
+                "sys.argv",
+                ["circleci_process", "--org=github/my-org", str(simple_config)],
+            ):
+                with pytest.raises(SystemExit) as exc_info:
+                    circleci_process.main()
+
+        assert exc_info.value.code == 0
+        assert "--org-slug=github/my-org" in mock_run.call_args[0][0]

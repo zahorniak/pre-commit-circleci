@@ -9,6 +9,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+import circleci_cli
+
 
 @pytest.fixture
 def fixtures_dir() -> Path:
@@ -119,3 +121,25 @@ workflows:
         mock_result.stderr = ""
         mock_run.return_value = mock_result
         yield mock_run
+
+
+@pytest.fixture(autouse=True)
+def reset_cli_detection_cache() -> Generator[None, None, None]:
+    """Reset the CLI detection cache before and after each test."""
+    circleci_cli._IS_V1 = None
+    yield
+    circleci_cli._IS_V1 = None
+
+
+@pytest.fixture
+def mock_cli_legacy() -> Generator[MagicMock, None, None]:
+    """Force detection of the legacy CLI (0.1.x)."""
+    with patch("circleci_cli.is_cli_v1", return_value=False) as mock_v1:
+        yield mock_v1
+
+
+@pytest.fixture
+def mock_cli_v1() -> Generator[MagicMock, None, None]:
+    """Force detection of CLI v1."""
+    with patch("circleci_cli.is_cli_v1", return_value=True) as mock_v1:
+        yield mock_v1

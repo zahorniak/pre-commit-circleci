@@ -17,11 +17,13 @@ class TestValidateConfig:
     def test_runs_validate_command(
         self,
         mock_subprocess_success: MagicMock,
+        mock_cli_legacy: MagicMock,
         simple_config: Path,
     ) -> None:
         """Test that circleci config validate is called correctly."""
         ret, stdout, stderr = circleci_pack_validate.validate_config(
             config_path=str(simple_config),
+            org=None,
             org_slug=None,
             org_id=None,
         )
@@ -34,11 +36,13 @@ class TestValidateConfig:
     def test_includes_org_slug(
         self,
         mock_subprocess_success: MagicMock,
+        mock_cli_legacy: MagicMock,
         simple_config: Path,
     ) -> None:
         """Test that org-slug is included in command."""
         circleci_pack_validate.validate_config(
             config_path=str(simple_config),
+            org=None,
             org_slug="github/org",
             org_id=None,
         )
@@ -49,11 +53,13 @@ class TestValidateConfig:
     def test_includes_org_id(
         self,
         mock_subprocess_success: MagicMock,
+        mock_cli_legacy: MagicMock,
         simple_config: Path,
     ) -> None:
         """Test that org-id is included in command."""
         circleci_pack_validate.validate_config(
             config_path=str(simple_config),
+            org=None,
             org_slug=None,
             org_id="12345",
         )
@@ -166,6 +172,7 @@ class TestMain:
         assert exc_info.value.code == 1
         captured = capsys.readouterr()
         assert "CircleCI CLI not found" in captured.out
+        assert "https://cli.circleci.com/" in captured.out
 
     def test_fails_when_setup_config_not_found(
         self,
@@ -280,6 +287,7 @@ class TestMain:
     def test_validates_both_configs(
         self,
         mock_circleci_installed: MagicMock,
+        mock_cli_legacy: MagicMock,
         dynamic_setup_config: Path,
         dynamic_src_dir: Path,
         capsys: pytest.CaptureFixture[str],
@@ -337,6 +345,7 @@ class TestMain:
     def test_reports_pack_failure(
         self,
         mock_circleci_installed: MagicMock,
+        mock_cli_legacy: MagicMock,
         dynamic_setup_config: Path,
         dynamic_src_dir: Path,
         capsys: pytest.CaptureFixture[str],
@@ -375,6 +384,7 @@ class TestMain:
     def test_reports_continuation_validation_failure(
         self,
         mock_circleci_installed: MagicMock,
+        mock_cli_legacy: MagicMock,
         dynamic_setup_config: Path,
         dynamic_src_dir: Path,
         capsys: pytest.CaptureFixture[str],
@@ -419,6 +429,7 @@ class TestMain:
     def test_cleans_up_temp_file(
         self,
         mock_circleci_installed: MagicMock,
+        mock_cli_legacy: MagicMock,
         dynamic_setup_config: Path,
         dynamic_src_dir: Path,
     ) -> None:
@@ -463,6 +474,7 @@ class TestMain:
     def test_cleans_up_temp_file_on_error(
         self,
         mock_circleci_installed: MagicMock,
+        mock_cli_legacy: MagicMock,
         dynamic_setup_config: Path,
         dynamic_src_dir: Path,
     ) -> None:
@@ -510,3 +522,43 @@ class TestMain:
         # Verify temp file was created and then cleaned up
         assert len(created_temp_files) == 1
         assert not os.path.exists(created_temp_files[0])
+
+
+class TestCliV1:
+    """Tests for CLI v1 command translation in validate steps."""
+
+    def test_v1_validate_uses_config_flag(
+        self,
+        mock_circleci_installed: MagicMock,
+        mock_cli_v1: MagicMock,
+    ) -> None:
+        result = MagicMock()
+        result.returncode = 0
+        result.stdout = "valid"
+        result.stderr = ""
+        with patch("subprocess.run", return_value=result) as mock_run:
+            circleci_pack_validate.validate_config("cfg.yml", None, None, None)
+
+        assert mock_run.call_args[0][0] == [
+            "circleci",
+            "config",
+            "validate",
+            "--config",
+            "cfg.yml",
+        ]
+
+    def test_v1_validate_translates_org_slug(
+        self,
+        mock_circleci_installed: MagicMock,
+        mock_cli_v1: MagicMock,
+    ) -> None:
+        result = MagicMock()
+        result.returncode = 0
+        result.stdout = "valid"
+        result.stderr = ""
+        with patch("subprocess.run", return_value=result) as mock_run:
+            circleci_pack_validate.validate_config(
+                "cfg.yml", None, "github/my-org", None
+            )
+
+        assert "--org=github/my-org" in mock_run.call_args[0][0]

@@ -1,33 +1,90 @@
 #!/usr/bin/env python3
+"""
+circleci_validate.py
+~~~~~~~~~~~~~~~~~~~~
 
+A *pre-commit* hook that runs `circleci config validate`.
+
+The hook supports the legacy CLI (0.1.x) and CLI v1. It translates
+the path, org, and verbose arguments for the detected generation.
+
+Exit code:
+  * 0 - validation passed
+  * 1 - validation failed, or the CLI is not installed
+"""
+
+from __future__ import annotations
+
+import argparse
 import os
+import shutil
 import subprocess
 import sys
-import shutil
+
+from circleci_cli import CLI_INSTALL_URL, build_validate_cmd, cli_env
 
 
-def main():
-    # Check if running in CircleCI environment
+def parse_args() -> tuple[argparse.Namespace, list[str]]:
+    """Return the parsed known arguments and the unknown remainder."""
+    parser = argparse.ArgumentParser(
+        description="Run `circleci config validate` inside pre-commit.",
+    )
+    parser.add_argument(
+        "filename",
+        nargs="?",
+        help="config file to validate (default: .circleci/config.yml)",
+    )
+    parser.add_argument(
+        "--org-slug",
+        help="organization slug (e.g. github/example-org) for private orbs",
+    )
+    parser.add_argument(
+        "--org-id",
+        help="organization ID for private orbs",
+    )
+    parser.add_argument(
+        "--org",
+        help="organization slug or ID (CLI v1 style) for private orbs",
+    )
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        action="store_true",
+        help="verbose CLI output (--verbose on legacy, --debug on CLI v1)",
+    )
+    return parser.parse_known_args()
+
+
+def main() -> None:
+    """Entry-point for the pre-commit hook."""
+    args, extra = parse_args()
+
+    # Skip the hook in the CircleCI environment.
     if os.getenv("CIRCLECI"):
-        print("Circleci environment detected, skipping validation.")
+        print("CircleCI environment detected, skipping validation.")
         sys.exit(0)
 
-    # Check if CircleCI CLI is installed
+    # Stop when the CircleCI CLI is not installed.
     if not shutil.which("circleci"):
-        print(
-            "Circleci CLI could not be found. Install the latest CLI version https://circleci.com/docs/2.0/local-cli/#installation"
-        )
+        print(f"CircleCI CLI not found. Install: {CLI_INSTALL_URL}")
         sys.exit(1)
 
-    # Validate CircleCI config
-    try:
-        command = ["circleci", "config", "validate"] + sys.argv[1:]
-        result = subprocess.run(command, capture_output=True, text=True)
-        result.check_returncode()
+    cmd = build_validate_cmd(
+        path=args.filename,
+        org=args.org,
+        org_slug=args.org_slug,
+        org_id=args.org_id,
+        verbose=args.verbose,
+        extra=extra,
+    )
+    result = subprocess.run(
+        cmd, capture_output=True, text=True, check=False, env=cli_env()
+    )
+    if result.returncode == 0:
         print("CircleCI Configuration Passed Validation.")
-    except subprocess.CalledProcessError as e:
+    else:
         print("CircleCI Configuration Failed Validation.")
-        print(e.stderr)
+        sys.stderr.write(result.stdout + result.stderr)
         sys.exit(1)
 
 
